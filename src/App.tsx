@@ -1,11 +1,12 @@
 import { Flex, Text, Input, HStack, Button, PinInput, PinInputField, Box, Checkbox } from "@chakra-ui/react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+
+import JSConfetti from "js-confetti"
 
 import "./App.css"
 import _ from "lodash"
 
 function determineGuessColor(correctNumber: string, guess: string, index: number): string {
-  console.log(correctNumber, guess, index)
   if(correctNumber.charAt(index) == guess.charAt(index)) return "green"
   if(correctNumber.includes(guess.charAt(index))) return "orange"
   return "red"
@@ -16,11 +17,30 @@ export default function App() {
   const [correctNumber, setCorrectNumber] = useState<number | null>(null)
   const [currentTries, setCurrentTries] = useState<number[]>([])
   const [maxTries, setMaxTries] = useState<number>(10)
+  const [numberLength, setNumberLength] = useState<number>(4)
   const [guess, setGuess] = useState<string>("")
   const [easyMode, setEasyMode] = useState<boolean>(false)
 
   const [wins, setWins] = useState<number>(0)
   const [loses, setLoses] = useState<number>(0)
+
+  
+  useEffect(() => {
+    const confetti = new JSConfetti()
+    if(gameState == 2) {
+      for(let i = 0; i < 10; i++) {
+        setTimeout(() => confetti.addConfetti({
+          emojis: Array.from("➕➖➗🧠📱🔢🧮"),
+        }), i*1000)
+      }
+    } else if(gameState == 3) {
+      for(let i = 0; i < 10; i++) {
+        setTimeout(() => confetti.addConfetti({
+          emojis: Array.from("👎💥👢📑📚🧾🥾"),
+        }), i*1000)
+      }
+    }
+  }, [gameState])
 
   return (
     <Flex
@@ -53,6 +73,16 @@ export default function App() {
               }} />
             </HStack>
             <HStack>
+              <Text>Number Digits: </Text>
+              <Input type="number" defaultValue={numberLength} variant="flushed" w="30px" textAlign="center" onChange={(e) => {
+                const value = parseInt(e.target.value)
+                if (value < 1) e.target.value = "1"
+                if (value > 9) e.target.value = "9"
+
+                setNumberLength(parseInt(e.target.value))
+              }} />
+            </HStack>
+            <HStack>
               <Text>Easy Mode:</Text>
               <Checkbox isChecked={easyMode} onChange={(e) => setEasyMode(e.target.checked)} />
             </HStack>
@@ -62,10 +92,16 @@ export default function App() {
             setGameState(1)
             setCurrentTries([])
             setGuess("")
-            const randNum = parseInt(_.sampleSize("123456789", 4).join(""))
+            const randNum = parseInt(_.sampleSize("123456789", numberLength).join(""))
             setCorrectNumber(randNum)
-            console.log(randNum)
           }}>START</Button>
+
+          <br />
+          <br />
+          <br />
+
+          <Text fontSize="3xl">How to play:</Text>
+          <Text maxW="600px" p={2} fontSize="sm" color="gray.300">{"Number Gsr is a simple number guessing game. Your goal is to guess an n-digit number within a set amount of attempts. The number contains unique digits (each number can appear once), and the digits it contains is from 1 to 9, so 0 is not included. After each incorrect guess, you will be told how many numbers you've guessed correctly, and how many of them are in the correct positions. However, you won't be told what the precise numbers are. The win/lose ratio can be seen at the top-right of the page. Good luck :)"}</Text>
         </>
       )}
 
@@ -89,10 +125,7 @@ export default function App() {
               <HStack gap={5} key={attempt.toString() + "-attempt"}>
                 <HStack>
                   <PinInput isDisabled value={attempt.toString() + 2 + 3} size="lg">
-                    <PinInputField borderColor={easyMode ? determineGuessColor((correctNumber || "").toString(), attempt.toString(), 0) : "red"} />
-                    <PinInputField borderColor={easyMode ? determineGuessColor((correctNumber || "").toString(), attempt.toString(), 1) : "red"} />
-                    <PinInputField borderColor={easyMode ? determineGuessColor((correctNumber || "").toString(), attempt.toString(), 2) : "red"} />
-                    <PinInputField borderColor={easyMode ? determineGuessColor((correctNumber || "").toString(), attempt.toString(), 3) : "red"} />
+                    {Array(numberLength).fill(true).map((_, index) => <PinInputField key={"guess-"+attempt.toString()+index} borderColor={easyMode ? determineGuessColor((correctNumber || "").toString(), attempt.toString(), index) : "red"} />)}
                   </PinInput>
                 </HStack>
 
@@ -109,7 +142,7 @@ export default function App() {
             <HStack>
               <PinInput size="lg" type="number" value={guess} otp onChange={value => {
                 setGuess(value)
-                if (value.length == 4) {
+                if (value.length == numberLength) {
                   if (!currentTries.includes(parseInt(value))) {
                     setGuess("")
                     if (parseInt(value) == correctNumber) {
@@ -125,10 +158,7 @@ export default function App() {
                   }
                 }
               }}>
-                <PinInputField />
-                <PinInputField />
-                <PinInputField />
-                <PinInputField />
+                {Array(numberLength).fill(true).map((_, index) => <PinInputField key={"input-"+index} />)}
               </PinInput>
 
             </HStack>
@@ -145,8 +175,9 @@ export default function App() {
       {gameState == 2 && (
         <>
           <Text
-            fontWeight="semibold"
-            fontSize="6xl"
+            fontWeight="medium"
+            fontSize="2xl"
+            mb={5}
           >
             You won! The number was {correctNumber}
           </Text>
@@ -157,8 +188,9 @@ export default function App() {
       {gameState == 3 && (
         <>
           <Text
-            fontWeight="semibold"
-            fontSize="6xl"
+            fontWeight="medium"
+            fontSize="2xl"
+            mb={5}
           >
             You lost! The number was {correctNumber}
           </Text>
