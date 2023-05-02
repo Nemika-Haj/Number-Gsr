@@ -45,9 +45,8 @@ export default function App() {
   return (
     <Flex
       minH="100vh"
-      w="100vw"
       maxW="100vw"
-      className="bg"
+      className={gameState == 1 ? "bg-playing" : gameState == 3 ? "bg-lost" : "bg"}
       direction="column"
       alignItems="center"
       p={5}
