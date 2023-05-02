@@ -100,7 +100,7 @@ export default function App() {
           <br />
 
           <Text fontSize="3xl">How to play:</Text>
-          <Text maxW="600px" p={2} fontSize="sm" color="gray.300">{"Number Gsr is a simple number guessing game. Your goal is to guess an n-digit number within a set amount of attempts. The number contains unique digits (each number can appear once), and the digits it contains range from 1 to 9, so 0 is not included. After each incorrect guess, you will be told how many numbers you've guessed correctly, and how many of them are in the correct positions. However, you won't be told what the precise numbers are. The win/lose ratio can be seen at the top-right of the page. Good luck :)"}</Text>
+          <Text maxW="600px" p={2} fontSize="sm" color="gray.300">{"Number Gsr is a simple number guessing game. Your goal is to guess an n-digit number within a set amount of attempts. The number contains unique digits (each number can appear once), and the digits it contains range from 1 to 9, so 0 is not included. After each incorrect guess, you will be told how many numbers you've guessed correctly, and how many of them are in the correct positions. However, you won't be told what the precise numbers are, unless you enable Easy Mode. If Easy Mode is enabled, correct numbers will be highlighted with an orange border, and if they also happen to be in the correct position, the border will turn green. The win/lose ratio can be seen at the top-right of the page. Good luck :)"}</Text>
         </>
       )}
 
